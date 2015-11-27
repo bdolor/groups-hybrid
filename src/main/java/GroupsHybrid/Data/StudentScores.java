@@ -8,6 +8,8 @@ public class StudentScores {
 	public final static int MAXIMUM_STUDENTS = 512;
 
 	private static double[][] Distance = null;
+	
+	private static int [] allSummedScores = null;
 
 	public StudentScores() {
 
@@ -19,6 +21,7 @@ public class StudentScores {
 				}
 			}
 		}
+		this.setAllSummedScores();
 	}
 
 	/**
@@ -101,7 +104,7 @@ public class StudentScores {
 	 * @param student2
 	 * @return 
 	 */
-	private double getDistance(int student1, int student2) {
+	public double getDistance(int student1, int student2) {
 		int s1 = student1 < student2 ? student1 : student2;
 		int s2 = student1 < student2 ? student2 : student1;
 
@@ -127,13 +130,17 @@ public class StudentScores {
 	 * 
 	 * @return 
 	 */
-	public int[] getAllScores(){
+	private void setAllSummedScores(){
 		int [] allScores = new int[StudentScores.MAXIMUM_STUDENTS];
 		for( int i = 0; i < StudentScores.MAXIMUM_STUDENTS; i++){
 			allScores[i] = this.getSumScore(i+1);
 		}
-		return allScores;
+		StudentScores.allSummedScores = allScores;
 	
+	}
+	
+	public int [] getAllSummedScores(){
+		return StudentScores.allSummedScores;
 	}
 	
 	private static int[][] Scores = new int[][] { { 2, 2, 2, 2, 2, 3, 3 }, { 2, 2, 1, 2, 2, 2, 2 },

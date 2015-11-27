@@ -13,7 +13,7 @@ import main.java.GroupsHybrid.Data.StudentScores;
 public class Program {
 
 	private final static int MAX_ITERATIONS = 10000;
-	private final static int ANTS = 10;
+	private final static int ANTS = (int) Math.round(0.6 * StudentScores.MAXIMUM_STUDENTS);
 	private final static double ALPHA = 0.1;//3.0;
 	private final static double BETA = 2;//2.0;
 	private final static double RHO = 0.1;//0.01;
@@ -21,22 +21,11 @@ public class Program {
 	
 	public static void main(String[] args) {
 		StudentScores scores = new StudentScores();
-		int [] studentNodes = scores.getAllScores();
+		int [] studentNodes = scores.getAllSummedScores();
 		AntColony ac = new AntColonyArray();
 		long start = System.currentTimeMillis();
 		ac.solve(studentNodes, MAX_ITERATIONS, ANTS, ALPHA, BETA, RHO, Q);
 		System.out.println("time: " + (System.currentTimeMillis() - start));
-	}
-
-
-	private static List<Node> convertTostudentNodes(List<String> data) {
-		List<Node> studentNodes = new ArrayList<Node>();
-		for (String s : data) {
-			String[] tokens = s.split(" ");
-			Node node = new Node(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
-			studentNodes.add(node);
-		}
-		return studentNodes;
 	}
 
 }
