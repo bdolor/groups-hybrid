@@ -12,7 +12,7 @@ import org.jfree.ui.ApplicationFrame;
 
 import main.java.GroupsHybrid.GeneticAlgorithm.GeneticAlgorithm;
 import main.java.GroupsHybrid.GeneticAlgorithm.GeneticAlgorithmConfig;
-import main.java.GroupsHybrid.GeneticAlgorithm.Data.StudentScores;
+import main.java.GroupsHybrid.Data.StudentScores;
 import main.java.GroupsHybrid.GeneticAlgorithm.GroupEncoding.GroupEncodingChromosome;
 import main.java.GroupsHybrid.GeneticAlgorithm.Interfaces.IChromosome;
 import main.java.GroupsHybrid.GeneticAlgorithm.Interfaces.IReport;

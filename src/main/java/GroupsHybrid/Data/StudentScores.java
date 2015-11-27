@@ -1,7 +1,6 @@
-package main.java.GroupsHybrid.GeneticAlgorithm.Data;
+package main.java.GroupsHybrid.Data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class StudentScores {

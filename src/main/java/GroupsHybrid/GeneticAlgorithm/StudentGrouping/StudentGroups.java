@@ -3,7 +3,7 @@ package main.java.GroupsHybrid.GeneticAlgorithm.StudentGrouping;
 import java.util.ArrayList;
 
 import main.java.GroupsHybrid.GeneticAlgorithm.Common.PermutationChromosome;
-import main.java.GroupsHybrid.GeneticAlgorithm.Data.StudentScores;
+import main.java.GroupsHybrid.Data.StudentScores;
 import main.java.GroupsHybrid.GeneticAlgorithm.Interfaces.IStudentChromosome;
 
 public class StudentGroups extends PermutationChromosome implements IStudentChromosome {

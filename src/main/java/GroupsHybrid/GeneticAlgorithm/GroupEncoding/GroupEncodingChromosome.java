@@ -4,7 +4,7 @@ package main.java.GroupsHybrid.GeneticAlgorithm.GroupEncoding;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import main.java.GroupsHybrid.GeneticAlgorithm.Data.StudentScores;
+import main.java.GroupsHybrid.Data.StudentScores;
 import main.java.GroupsHybrid.GeneticAlgorithm.Interfaces.IChromosome;
 import main.java.GroupsHybrid.GeneticAlgorithm.Interfaces.IFactory;
 import main.java.GroupsHybrid.GeneticAlgorithm.Interfaces.IStudentChromosome;
