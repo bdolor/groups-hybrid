@@ -46,6 +46,15 @@ public class StudentScores {
 		return StudentScores.Scores[studentId - 1];
 	}
 
+	/**
+	 * Given four student IDs, return the GH value of the group
+	 * 
+	 * @param student1
+	 * @param student2
+	 * @param student3
+	 * @param student4
+	 * @return 
+	 */
 	public double getGhValue(int student1, int student2, int student3, int student4) {
 		ArrayList<Integer> scores = new ArrayList<Integer>();
 		scores.add(this.getSumScore(student1));
@@ -61,6 +70,15 @@ public class StudentScores {
 		return ghValue;
 	}
 
+	/**
+	 * Given four student IDs return the maximum Euclidean Distance of that group
+	 * 
+	 * @param student1
+	 * @param student2
+	 * @param student3
+	 * @param student4
+	 * @return 
+	 */
 	public double getMaxDistance(int student1, int student2, int student3, int student4) {
 		ArrayList<Double> distances = new ArrayList<Double>();
 
@@ -76,7 +94,14 @@ public class StudentScores {
 		return distances.get(5);
 	}
 
-	protected double getDistance(int student1, int student2) {
+	/**
+	 * Given two students, calculate the Euclidean Distance between them
+	 * 
+	 * @param student1
+	 * @param student2
+	 * @return 
+	 */
+	private double getDistance(int student1, int student2) {
 		int s1 = student1 < student2 ? student1 : student2;
 		int s2 = student1 < student2 ? student2 : student1;
 
@@ -97,7 +122,20 @@ public class StudentScores {
 		return StudentScores.Distance[s1][s2];
 
 	}
-
+	
+	/**
+	 * 
+	 * @return 
+	 */
+	public int[] getAllScores(){
+		int [] allScores = new int[StudentScores.MAXIMUM_STUDENTS];
+		for( int i = 0; i < StudentScores.MAXIMUM_STUDENTS; i++){
+			allScores[i] = this.getSumScore(i+1);
+		}
+		return allScores;
+	
+	}
+	
 	private static int[][] Scores = new int[][] { { 2, 2, 2, 2, 2, 3, 3 }, { 2, 2, 1, 2, 2, 2, 2 },
 			{ 2, 2, 2, 1, 1, 1, 2 }, { 1, 2, 2, 1, 2, 2, 3 }, { 2, 2, 2, 2, 2, 1, 1 }, { 3, 2, 2, 3, 1, 1, 1 },
 			{ 2, 2, 2, 2, 2, 1, 1 }, { 1, 2, 2, 1, 1, 2, 1 }, { 2, 1, 2, 2, 1, 1, 1 }, { 2, 2, 2, 2, 3, 1, 2 },

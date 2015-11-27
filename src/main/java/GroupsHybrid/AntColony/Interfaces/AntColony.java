@@ -6,7 +6,7 @@ import main.java.GroupsHybrid.AntColony.Node;
 
 public interface AntColony {
 
-	public abstract List<Integer> solve(List<Node> nodes, int iterations,
+	public abstract List<Integer> solve(int[] studentNodes, int iterations,
 			int antCount, double alpha, double beta, double rho, double Q);
 
 }

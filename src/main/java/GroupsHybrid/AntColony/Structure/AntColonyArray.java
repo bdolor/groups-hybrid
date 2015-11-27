@@ -13,12 +13,12 @@ import main.java.GroupsHybrid.AntColony.Node;
 public class AntColonyArray implements AntColony {
 
 	@Override
-	public List<Integer> solve(List<Node> nodes, int iterations, int antCount,
+	public List<Integer> solve(int[] studentNodes, int iterations, int antCount,
 			double alpha, double beta, double rho, double Q) {
 		
-		double[][] distances = InitializerArray.computeDistances(nodes);
-		double[][] pheromones = InitializerArray.initPheromones(nodes);
-		int[][] ants = InitializerArray.initAnts(antCount, nodes);
+		double[][] distances = InitializerArray.computeDistances(studentNodes);
+		double[][] pheromones = InitializerArray.initPheromones(studentNodes);
+		int[][] ants = InitializerArray.initAnts(antCount, studentNodes);
 		int[] bestTrail = getBestTrail(ants, distances);
 		double bestLength = getLength(bestTrail, distances);
 

@@ -5,43 +5,50 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import main.java.GroupsHybrid.AntColony.Node;
 
 public class InitializerArray {
 
-	public static double[][] computeDistances(List<Node> nodes) {
-		double[][] globalDistances = new double[nodes.size()][nodes.size()];
-		for (int i = 0; i < nodes.size(); i++) {
-			for (int j = i + 1; j < nodes.size(); j++) {
-				double distance = Math
-						.sqrt(Math.pow(nodes.get(i).getX()
-								- nodes.get(j).getX(), 2)
-								+ Math.pow(nodes.get(i).getY()
-										- nodes.get(j).getY(), 2));
-				globalDistances[i][j] = distance;
-				globalDistances[j][i] = distance;
-			}
-		}
+	/**
+	 * Instead of calculating the distance between all cities from the perspective
+	 * of a snapshot of all the cities, this should return the Euclidean Distances between students
+	 * from the perspective of a snapshot of all the students.
+	 * 
+	 * @param studentNodes
+	 * @return 
+	 */
+	public static double[][] computeDistances(int[] studentNodes) {
+		double[][] globalDistances = new double[studentNodes.length][studentNodes.length];
+//		for (int i = 0; i < studentNodes.size(); i++) {
+//			for (int j = i + 1; j < studentNodes.size(); j++) {
+//				double distance = Math
+//						.sqrt(Math.pow(studentNodes.get(i).getX()
+//								- studentNodes.get(j).getX(), 2)
+//								+ Math.pow(studentNodes.get(i).getY()
+//										- studentNodes.get(j).getY(), 2));
+//				globalDistances[i][j] = distance;
+//				globalDistances[j][i] = distance;
+//	}
+//		}
 		return globalDistances;
 	}
 
-	public static double[][] initPheromones(List<Node> nodes) {
-		double[][] globalPheromones = new double[nodes.size()][nodes.size()];
-		for (int i = 0; i < nodes.size(); i++) {
-			for (int j = 0; j < nodes.size(); j++) {
-				globalPheromones[i][j] = 0.01;
-			}
-		}
+	public static double[][] initPheromones(int[] studentNodes) {
+		double[][] globalPheromones = new double[studentNodes.length][studentNodes.length];
+//		for (int i = 0; i < studentNodes.size(); i++) {
+//			for (int j = 0; j < studentNodes.size(); j++) {
+//				globalPheromones[i][j] = 0.01;
+//			}
+//		}
 		return globalPheromones;
 	}
 
-	public static int[][] initAnts(int antCount, List<Node> nodes) {
+	public static int[][] initAnts(int antCount, int[] studentNodes) {
 		Random rand = new Random();
-		// trail has length nodes.size() + 1, because we include the start city
+		// trail has length studentNodes.size() + 1, because we include the start city
 		// at the end
-		int[][] ants = new int[antCount][nodes.size() + 1];
+		int[][] ants = new int[antCount][studentNodes.length + 1];
 		for (int i = 0; i < antCount; i++) {
-			ants[i] = getRandomTrail(rand.nextInt(nodes.size()), nodes.size());
+			ants[i] = getRandomTrail(rand.nextInt(studentNodes.length), studentNodes.length);
 		}
 		return ants;
 	}
