@@ -9,7 +9,7 @@ import java.util.List;
 import main.java.GroupsHybrid.AntColony.Structure.AntColonyArray;
 
 
-public class AntColonyMain {
+public class Program {
 
 	private final static int MAX_ITERATIONS = 10000;
 	private final static int ANTS = 10;
