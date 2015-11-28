@@ -93,7 +93,7 @@ public class AntColonyArray implements AntColony {
 		boolean[] visited = new boolean[numStudents];
 		trail[0] = start;
 		visited[start] = true;
-		for (int i = 0; i < numStudents - 1; i++) {
+		for (int i = 0; i < numStudents; i++) {
 			int next = nextStudent(trail[i], visited, pheromones, distances, alpha, beta);
 			trail[i + 1] = next;
 			visited[next] = true;
@@ -118,16 +118,16 @@ public class AntColonyArray implements AntColony {
 		double[] moveProbabilities = getMoveProbabilities(studentId, visited,
 			pheromones, distances, alpha, beta);
 
-		int numCities = pheromones.length;
-		double[] cumul = new double[numCities + 1];
+		int numStudents = pheromones.length;
+		double[] cumul = new double[numStudents];
 		cumul[0] = 0.0;
-		for (int i = 0; i < numCities; i++) {
+		for (int i = 0; i < numStudents; i++) {
 			cumul[i + 1] = cumul[i] + moveProbabilities[i];
 		}
-		cumul[numCities] = 1.0;
+		cumul[numStudents] = 1.0;
 
 		double position = new Random().nextDouble();
-		for (int i = 0; i < numCities; i++) {
+		for (int i = 0; i < numStudents; i++) {
 			if (position >= cumul[i] && position < cumul[i + 1]) {
 				return i;
 			}
@@ -149,25 +149,25 @@ public class AntColonyArray implements AntColony {
 	 */
 	private double[] getMoveProbabilities(int studentId, boolean[] visited,
 		double[][] pheromones, double[][] distances, double alpha, double beta) {
-		int numCities = pheromones.length;
-		double[] taueta = new double[numCities];
+		int numStudents = pheromones.length;
+		double[] taueta = new double[numStudents];
 		double sum = 0.0;
 
-		for (int i = 0; i < numCities; i++) {
+		for (int i = 0; i < numStudents; i++) {
 			if (!visited[i]) {
 				taueta[i] = Math.pow(pheromones[studentId][i], alpha)
 					* Math.pow((1.0 / distances[studentId][i]), beta);
 				if (taueta[i] < 0.0001) {
 					taueta[i] = 0.0001;
-				} else if (taueta[i] > (Double.MAX_VALUE / (numCities * 100))) {
-					taueta[i] = Double.MAX_VALUE / (numCities * 100);
+				} else if (taueta[i] > (Double.MAX_VALUE / (numStudents * 100))) {
+					taueta[i] = Double.MAX_VALUE / (numStudents * 100);
 				}
 			}
 			sum += taueta[i];
 		}
 
-		double[] probabilities = new double[numCities];
-		for (int i = 0; i < numCities; i++) {
+		double[] probabilities = new double[numStudents];
+		for (int i = 0; i < numStudents; i++) {
 			probabilities[i] = taueta[i] / sum;
 		}
 		return probabilities;
