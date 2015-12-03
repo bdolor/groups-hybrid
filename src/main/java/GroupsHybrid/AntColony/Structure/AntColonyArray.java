@@ -13,6 +13,7 @@ import main.java.GroupsHybrid.Data.StudentScores;
 public class AntColonyArray implements AntColony {
 
 	private StudentScores scores = new StudentScores();
+	private int whatisit;
 
 	@Override
 	public List<Integer> solve(int[] studentNodes, int iterations, int antCount,
@@ -57,7 +58,9 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * TODO - make it work 
+	 * Move the ants from one student to the next, starting with a 
+	 * random number between 0 and the number of students which serves 
+	 * as start position/next student ID that the ant begin to visit.
 	 * 
 	 * @param ants
 	 * @param pheromones
@@ -77,14 +80,14 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * TODO - make it work 
+	 * Given a start position/student ID take an ant on a tour to build a trail 
 	 * 
 	 * @param start
 	 * @param pheromones
 	 * @param distances
 	 * @param alpha
 	 * @param beta
-	 * @return 
+	 * @return trail - ant tour
 	 */
 	private int[] buildTrail(int start, double[][] pheromones,
 		double[][] distances, double alpha, double beta) {
@@ -93,6 +96,10 @@ public class AntColonyArray implements AntColony {
 		boolean[] visited = new boolean[numStudents];
 		trail[0] = start;
 		visited[start] = true;
+		
+		// when taking an ant on a tour, choosing where to go next is a 
+		// combination of how big the ED distance is, how strong the pheromone level is
+		// and if the student hasn't been visited before. 
 		for (int i = 0; i < numStudents; i++) {
 			int next = nextStudent(trail[i], visited, pheromones, distances, alpha, beta);
 			trail[i + 1] = next;
@@ -111,7 +118,7 @@ public class AntColonyArray implements AntColony {
 	 * @param distances
 	 * @param alpha
 	 * @param beta
-	 * @return
+	 * @return 
 	 */
 	private int nextStudent(int studentId, boolean[] visited, double[][] pheromones,
 		double[][] distances, double alpha, double beta) {
@@ -119,25 +126,35 @@ public class AntColonyArray implements AntColony {
 			pheromones, distances, alpha, beta);
 
 		int numStudents = pheromones.length;
-		double[] cumul = new double[numStudents];
+
+		// create a sorted (ascending) list of probabilities for each 
+		// student 
+		// need to add  
+		double[] cumul = new double[numStudents + 1];
 		cumul[0] = 0.0;
 		for (int i = 0; i < numStudents; i++) {
-			cumul[i + 1] = cumul[i] + moveProbabilities[i];
+			cumul[i+1] = cumul[i] + moveProbabilities[i];
 		}
+		// need the last one to be this val in case the next one is 511
 		cumul[numStudents] = 1.0;
-
+		
+		// pick a random number, iterate through the sorted list
+		// if that number is in between the current student and next student
+		// return the index of that student.
 		double position = new Random().nextDouble();
 		for (int i = 0; i < numStudents; i++) {
 			if (position >= cumul[i] && position < cumul[i + 1]) {
+				// @TODO - DOES THIS NEED TO BE I-1 TO RETURN STUDENT ID?
 				return i;
 			}
+		this.whatisit = i;	
 		}
-
 		return -1;
 	}
 
 	/**
-	 * TODO - make it work  
+	 * TODO - LOOK AT THIS MEASUREMENT, LIKELY DIFFERENT FOR ED distance.
+	 * NEEDS TO CHANGE
 	 * 
 	 * @param studentId
 	 * @param visited
@@ -153,6 +170,10 @@ public class AntColonyArray implements AntColony {
 		double[] taueta = new double[numStudents];
 		double sum = 0.0;
 
+		// calculate that probability that a student will be visited 
+		// based on a meausurement of both pheremone level
+		// and distance 
+		// sum all these measurements 
 		for (int i = 0; i < numStudents; i++) {
 			if (!visited[i]) {
 				taueta[i] = Math.pow(pheromones[studentId][i], alpha)
@@ -166,6 +187,8 @@ public class AntColonyArray implements AntColony {
 			sum += taueta[i];
 		}
 
+		// divide each measurement of distance and pheromone 
+		// by the sum of these measurements above
 		double[] probabilities = new double[numStudents];
 		for (int i = 0; i < numStudents; i++) {
 			probabilities[i] = taueta[i] / sum;
@@ -233,7 +256,7 @@ public class AntColonyArray implements AntColony {
 	 */
 	private double getSumGh(int[] trail) {
 		int sumGh = 0;
-
+		
 		for (int i = 0; i < scores.MAXIMUM_STUDENTS / 4; i++) {
 			int s1 = trail[(i * 4)];
 			int s2 = trail[(i * 4) + 1];
