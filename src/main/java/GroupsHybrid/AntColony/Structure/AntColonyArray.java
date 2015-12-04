@@ -184,8 +184,10 @@ public class AntColonyArray implements AntColony {
 		// sum all these measurements 
 		for (int i = 0; i < numStudents; i++) {
 			if (!visited[i]) {
+				// need something where a bigger distance translates to 
+				// a bigger probability
 				taueta[i] = Math.pow(pheromones[studentId][i], alpha)
-					* Math.pow((1.0 / distances[studentId][i]), beta);
+					* Math.pow((0.1 * distances[studentId][i]), beta); // @TODO - not backed up by antying but convenience
 				if (taueta[i] < 0.0001) {
 					taueta[i] = 0.0001;
 				} else if (taueta[i] > (Double.MAX_VALUE / (numStudents * 100))) {
@@ -217,12 +219,13 @@ public class AntColonyArray implements AntColony {
 		for (int i = 0; i < pheromones.length; ++i) {
 			for (int j = i + 1; j < pheromones[i].length; ++j) {
 					double gh = getSumGh(bestAnt);
-					double decrease = (1.0 - rho) * pheromones[i][j];
+					double evaporate = (1.0 - rho) * pheromones[i][j];
 					double increase = 0.0;
 					if (isEdgeInTrail(i, j, bestAnt)) {
-						increase = (Q / gh);
+						// @TODO - needs to change, not backed up by anything but convenience
+						increase = (Q * (gh * .001));
 					}
-					pheromones[i][j] = decrease + increase;
+					pheromones[i][j] = evaporate + increase;
 					pheromones[j][i] = pheromones[i][j];
 			}
 
