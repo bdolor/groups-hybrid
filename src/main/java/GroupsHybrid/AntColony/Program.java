@@ -13,7 +13,7 @@ import main.java.GroupsHybrid.Data.StudentScores;
 public class Program {
 
 	private final static int MAX_ITERATIONS = 10000;
-	private final static int ANTS = (int) Math.round(0.6 * StudentScores.MAXIMUM_STUDENTS);
+	private final static int ANTS = (int) Math.round(0.2 * StudentScores.MAXIMUM_STUDENTS);
 	private final static double ALPHA = 0.1;//3.0;
 	private final static double BETA = 2;//2.0;
 	private final static double RHO = 0.1;//0.01;

@@ -13,7 +13,6 @@ import main.java.GroupsHybrid.Data.StudentScores;
 public class AntColonyArray implements AntColony {
 
 	private StudentScores scores = new StudentScores();
-	private int whatisit;
 
 	@Override
 	public List<Integer> solve(int[] studentNodes, int iterations, int antCount,
@@ -28,11 +27,17 @@ public class AntColonyArray implements AntColony {
 		int count = 0;
 		boolean end = false;
 		while (!end) {
+			// @TODO updateTrails causing error
+			System.out.println("updateTrails begin...");
 			updateTrails(ants, pheromones, distances, alpha, beta);
-			updatePheromones(pheromones, ants, distances, rho, Q);
+			System.out.println("updateTrails done");
+			System.out.println("updatePheromones begin");
+			updatePheromones(pheromones, ants, rho, Q);
+			System.out.println("updatePheromone end");
 
 			int[] tmpBestTrail = getBestTrail(ants);
 			double tmpBestGH = getSumGh(tmpBestTrail);
+			System.out.println("find best trail begin");
 			if (tmpBestGH < bestGH) {
 				bestTrail = tmpBestTrail;
 				bestGH = tmpBestGH;
@@ -44,6 +49,9 @@ public class AntColonyArray implements AntColony {
 			if (++count >= iterations) {
 				end = true;
 			}
+		System.out.println("ITERATIONS = " + iterations);
+		//printTrail(bestTrail);
+
 		}
 		System.out.println("\n-------------AntColonyArray------------------------");
 		printTrail(bestTrail);
@@ -73,6 +81,7 @@ public class AntColonyArray implements AntColony {
 		Random rand = new Random();
 		int numStudents = pheromones.length;
 		for (int i = 0; i < ants.length; i++) {
+			// need the range of random numbers to be between 1 and 512
 			int start = rand.nextInt(numStudents);
 			int[] trail = buildTrail(start, pheromones, distances, alpha, beta);
 			ants[i] = trail;
@@ -95,22 +104,22 @@ public class AntColonyArray implements AntColony {
 		int[] trail = new int[numStudents];
 		boolean[] visited = new boolean[numStudents];
 		trail[0] = start;
-		visited[start] = true;
+		visited[start] = true;              
 		
 		// when taking an ant on a tour, choosing where to go next is a 
 		// combination of how big the ED distance is, how strong the pheromone level is
 		// and if the student hasn't been visited before. 
-		for (int i = 0; i < numStudents; i++) {
+		for (int i = 0; i < numStudents - 1; i++) {
 			int next = nextStudent(trail[i], visited, pheromones, distances, alpha, beta);
 			trail[i + 1] = next;
 			visited[next] = true;
 		}
-		trail[numStudents] = trail[0];
+		//trail[numStudents] = trail[0];
 		return trail;
 	}
 
 	/**
-	 * TODO - make it work  
+	 *   
 	 * 
 	 * @param studentId
 	 * @param visited
@@ -144,17 +153,14 @@ public class AntColonyArray implements AntColony {
 		double position = new Random().nextDouble();
 		for (int i = 0; i < numStudents; i++) {
 			if (position >= cumul[i] && position < cumul[i + 1]) {
-				// @TODO - DOES THIS NEED TO BE I-1 TO RETURN STUDENT ID?
 				return i;
 			}
-		this.whatisit = i;	
 		}
 		return -1;
 	}
 
 	/**
-	 * TODO - LOOK AT THIS MEASUREMENT, LIKELY DIFFERENT FOR ED distance.
-	 * NEEDS TO CHANGE
+	 * 
 	 * 
 	 * @param studentId
 	 * @param visited
@@ -171,8 +177,7 @@ public class AntColonyArray implements AntColony {
 		double sum = 0.0;
 
 		// calculate that probability that a student will be visited 
-		// based on a meausurement of both pheremone level
-		// and distance 
+		// based on a meausurement of both pheremone level and distance 
 		// sum all these measurements 
 		for (int i = 0; i < numStudents; i++) {
 			if (!visited[i]) {
@@ -197,7 +202,7 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * TODO - make it work  
+	 * TODO - This is incredibly slow, needs to be optimized  
 	 * 
 	 * @param pheromones
 	 * @param ants
@@ -205,8 +210,7 @@ public class AntColonyArray implements AntColony {
 	 * @param rho
 	 * @param Q 
 	 */
-	private void updatePheromones(double[][] pheromones, int[][] ants,
-		double[][] distances, double rho, double Q) {
+	private void updatePheromones(double[][] pheromones, int[][] ants, double rho, double Q) {
 		for (int i = 0; i < pheromones.length; ++i) {
 			for (int j = i + 1; j < pheromones[i].length; ++j) {
 				for (int k = 0; k < ants.length; ++k) {
@@ -220,11 +224,13 @@ public class AntColonyArray implements AntColony {
 					pheromones[j][i] = pheromones[i][j];
 				}
 			}
+			System.out.println("pheromone iteration #"+i);
+
 		}
 	}
 
 	private boolean isEdgeInTrail(int start, int stop, int[] trail) {
-		for (int i = 0; i < trail.length - 2; i++) {
+		for (int i = 0; i < trail.length - 1; i++) {
 			if (trail[i] == start && trail[i + 1] == stop) {
 				return true;
 			}
@@ -255,7 +261,7 @@ public class AntColonyArray implements AntColony {
 	 * @return
 	 */
 	private double getSumGh(int[] trail) {
-		int sumGh = 0;
+		double sumGh = 0.0;
 		
 		for (int i = 0; i < scores.MAXIMUM_STUDENTS / 4; i++) {
 			int s1 = trail[(i * 4)];
@@ -267,7 +273,7 @@ public class AntColonyArray implements AntColony {
 				sumGh += scores.getGhValue(s1, s2, s3, s4);
 			}
 		}
-		return (double) sumGh;
+		return sumGh;
 	}
 
 	private List<Integer> convertToList(int[] array) {

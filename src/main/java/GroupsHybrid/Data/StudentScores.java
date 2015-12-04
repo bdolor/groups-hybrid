@@ -31,7 +31,7 @@ public class StudentScores {
 	 * @return
 	 */
 	protected int getSumScore(int studentId) {
-		int scores[] = StudentScores.Scores[studentId - 1];
+		int scores[] = StudentScores.Scores[studentId];
 		int sum = 0;
 		for (int s : scores) {
 			sum += s;
@@ -46,7 +46,7 @@ public class StudentScores {
 	 * @return
 	 */
 	protected int[] getScores(int studentId) {
-		return StudentScores.Scores[studentId - 1];
+		return StudentScores.Scores[studentId];
 	}
 
 	/**
@@ -108,9 +108,6 @@ public class StudentScores {
 		int s1 = student1 < student2 ? student1 : student2;
 		int s2 = student1 < student2 ? student2 : student1;
 
-		s1--;
-		s2--;
-
 		if (StudentScores.Distance[s1][s2] == -1) {
 			int[] score1 = this.getScores(student1);
 			int[] score2 = this.getScores(student2);
@@ -133,7 +130,7 @@ public class StudentScores {
 	private void setAllSummedScores(){
 		int [] allScores = new int[StudentScores.MAXIMUM_STUDENTS];
 		for( int i = 0; i < StudentScores.MAXIMUM_STUDENTS; i++){
-			allScores[i] = this.getSumScore(i+1);
+			allScores[i] = this.getSumScore(i);
 		}
 		StudentScores.allSummedScores = allScores;
 	
