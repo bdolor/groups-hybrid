@@ -27,15 +27,18 @@ public class AntColonyArray implements AntColony {
 		int count = 0;
 		boolean end = false;
 		while (!end) {
-			// @TODO updateTrails causing error
 			System.out.println("updateTrails begin...");
 			updateTrails(ants, pheromones, distances, alpha, beta);
 			System.out.println("updateTrails done");
+			
+			// get the best one
+			int[] tmpBestTrail = getBestTrail(ants);
+			
+			// use the best one to update global pheremone level
 			System.out.println("updatePheromones begin");
-			updatePheromones(pheromones, ants, rho, Q);
+			updatePheromones(pheromones, tmpBestTrail, rho, Q);
 			System.out.println("updatePheromone end");
 
-			int[] tmpBestTrail = getBestTrail(ants);
 			double tmpBestGH = getSumGh(tmpBestTrail);
 			System.out.println("find best trail begin");
 			if (tmpBestGH < bestGH) {
@@ -210,21 +213,18 @@ public class AntColonyArray implements AntColony {
 	 * @param rho
 	 * @param Q 
 	 */
-	private void updatePheromones(double[][] pheromones, int[][] ants, double rho, double Q) {
+	private void updatePheromones(double[][] pheromones, int[] bestAnt, double rho, double Q) {
 		for (int i = 0; i < pheromones.length; ++i) {
 			for (int j = i + 1; j < pheromones[i].length; ++j) {
-				for (int k = 0; k < ants.length; ++k) {
-					double gh = getSumGh(ants[k]);
+					double gh = getSumGh(bestAnt);
 					double decrease = (1.0 - rho) * pheromones[i][j];
 					double increase = 0.0;
-					if (isEdgeInTrail(i, j, ants[k])) {
+					if (isEdgeInTrail(i, j, bestAnt)) {
 						increase = (Q / gh);
 					}
 					pheromones[i][j] = decrease + increase;
 					pheromones[j][i] = pheromones[i][j];
-				}
 			}
-			System.out.println("pheromone iteration #"+i);
 
 		}
 	}
