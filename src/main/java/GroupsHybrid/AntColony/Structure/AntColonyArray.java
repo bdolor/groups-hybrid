@@ -27,21 +27,19 @@ public class AntColonyArray implements AntColony {
 		int count = 0;
 		boolean end = false;
 		while (!end) {
-			System.out.println("updateTrails begin...");
+			long startTime = System.currentTimeMillis();
+			System.out.println("time updatetrails start: " + (System.currentTimeMillis() - startTime));
 			updateTrails(ants, pheromones, distances, alpha, beta);
-			System.out.println("updateTrails done");
-			
+			System.out.println("time pheromones start: " + (100*(System.currentTimeMillis() - startTime))+ " seconds");
+			// use the best one to update global pheremone level
+			updatePheromones(pheromones, ants, rho, Q);
+			System.out.println("time pheromones end: " + (100*(System.currentTimeMillis() - startTime)) + " seconds");
+
 			// get the best one
 			int[] tmpBestTrail = getBestTrail(ants);
-			
-			// use the best one to update global pheremone level
-			System.out.println("updatePheromones begin");
-			updatePheromones(pheromones, tmpBestTrail, rho, Q);
-			System.out.println("updatePheromone end");
-
 			double tmpBestGH = getSumGh(tmpBestTrail);
 			System.out.println("find best trail begin");
-			if (tmpBestGH < bestGH) {
+			if (tmpBestGH > bestGH) {
 				bestTrail = tmpBestTrail;
 				bestGH = tmpBestGH;
 
@@ -52,8 +50,7 @@ public class AntColonyArray implements AntColony {
 			if (++count >= iterations) {
 				end = true;
 			}
-		System.out.println("ITERATIONS = " + iterations);
-		//printTrail(bestTrail);
+		printTrail(bestTrail);
 
 		}
 		System.out.println("\n-------------AntColonyArray------------------------");
@@ -177,6 +174,7 @@ public class AntColonyArray implements AntColony {
 		double[][] pheromones, double[][] distances, double alpha, double beta) {
 		int numStudents = pheromones.length;
 		double[] taueta = new double[numStudents];
+		double maxED = 14;
 		double sum = 0.0;
 
 		// calculate that probability that a student will be visited 
@@ -187,7 +185,7 @@ public class AntColonyArray implements AntColony {
 				// need something where a bigger distance translates to 
 				// a bigger probability
 				taueta[i] = Math.pow(pheromones[studentId][i], alpha)
-					* Math.pow((0.1 * distances[studentId][i]), beta); // @TODO - not backed up by antying but convenience
+					* Math.pow((distances[studentId][i]/maxED), beta); // @TODO - not backed up by antying but convenience
 				if (taueta[i] < 0.0001) {
 					taueta[i] = 0.0001;
 				} else if (taueta[i] > (Double.MAX_VALUE / (numStudents * 100))) {
@@ -201,7 +199,7 @@ public class AntColonyArray implements AntColony {
 		// by the sum of these measurements above
 		double[] probabilities = new double[numStudents];
 		for (int i = 0; i < numStudents; i++) {
-			probabilities[i] = taueta[i] / sum;
+			probabilities[i] =  taueta[i] / sum;
 		}
 		return probabilities;
 	}
@@ -211,24 +209,23 @@ public class AntColonyArray implements AntColony {
 	 * 
 	 * @param pheromones
 	 * @param ants
-	 * @param distances
 	 * @param rho
 	 * @param Q 
 	 */
-	private void updatePheromones(double[][] pheromones, int[] bestAnt, double rho, double Q) {
+	private void updatePheromones(double[][] pheromones, int[][] ants, double rho, double Q) {
 		for (int i = 0; i < pheromones.length; ++i) {
 			for (int j = i + 1; j < pheromones[i].length; ++j) {
-					double gh = getSumGh(bestAnt);
-					double evaporate = (1.0 - rho) * pheromones[i][j];
+				for (int k = 0; k < ants.length; ++k) {
+					double length = getSumGh(ants[k]);
+					double decrease = (1.0 - rho) * pheromones[i][j];
 					double increase = 0.0;
-					if (isEdgeInTrail(i, j, bestAnt)) {
-						// @TODO - needs to change, not backed up by anything but convenience
-						increase = (Q * (gh * .001));
+					if (isEdgeInTrail(i, j, ants[k])) {
+						increase =(Q / length);
 					}
-					pheromones[i][j] = evaporate + increase;
+					pheromones[i][j] = decrease + increase;
 					pheromones[j][i] = pheromones[i][j];
+				}
 			}
-
 		}
 	}
 
