@@ -1,8 +1,6 @@
-package main.java.GroupsHybrid.AntColony.Interfaces;
+package main.java.Groups.AntColony.Interfaces;
 
 import java.util.List;
-
-import main.java.GroupsHybrid.AntColony.Node;
 
 public interface AntColony {
 

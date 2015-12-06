@@ -1,4 +1,4 @@
-package main.java.GroupsHybrid.Data;
+package main.java.Groups.Data;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,20 +59,29 @@ public class StudentScores {
 	 * @return 
 	 */
 	public double getGhValue(int student1, int student2, int student3, int student4) {
-		ArrayList<Integer> scores = new ArrayList<Integer>();
-		scores.add(this.getSumScore(student1));
-		scores.add(this.getSumScore(student2));
-		scores.add(this.getSumScore(student3));
-		scores.add(this.getSumScore(student4));
-		Collections.sort(scores);
+		double[] sorted = {this.getSumScore(student1), this.getSumScore(student2), this.getSumScore(student3), this.getSumScore(student4)};
+		this.sort(sorted);
 
-		double adValue = (scores.get(0) + scores.get(3)) / 2;
-		double ghValue = (scores.get(3) - scores.get(0))
-				/ (1 + Math.abs(adValue - scores.get(1)) + Math.abs(adValue - scores.get(2)));
-
+		double adValue = (sorted[0] + sorted[3]) / 2;
+		double ghValue = (sorted[3] - sorted[0])
+			/ (1 + Math.abs(adValue - sorted[1]) + Math.abs(adValue - sorted[2]));
 		return ghValue;
 	}
 
+	private void sort(double[] sorted) {
+
+		double tmp;
+		for (int i = 0; i < sorted.length - 1; i++) {
+			if (sorted[i] > (sorted[i + 1])) {
+				tmp = sorted[i];
+				sorted[i] = sorted[i + 1];
+				sorted[i + 1] = tmp;
+				sort(sorted);
+			}
+
+		}
+	}
+		
 	/**
 	 * Given four student IDs return the maximum Euclidean Distance of that group
 	 * 
@@ -83,18 +92,22 @@ public class StudentScores {
 	 * @return 
 	 */
 	public double getMaxDistance(int student1, int student2, int student3, int student4) {
-		ArrayList<Double> distances = new ArrayList<Double>();
-
-		distances.add(this.getDistance(student1, student2));
-		distances.add(this.getDistance(student1, student3));
-		distances.add(this.getDistance(student1, student4));
-		distances.add(this.getDistance(student2, student3));
-		distances.add(this.getDistance(student2, student4));
-		distances.add(this.getDistance(student3, student4));
-
-		Collections.sort(distances);
-
-		return distances.get(5);
+//		ArrayList<Double> distances = new ArrayList<Double>();
+		double max = 0.0;
+		double tmpMax1 = this.getDistance(student1, student2);
+		double tmpMax2 = this.getDistance(student1, student3);
+		double tmpMax3 = this.getDistance(student1, student4);
+		double tmpMax4 = this.getDistance(student2, student3);
+		double tmpMax5 = this.getDistance(student2, student4);
+		double tmpMax6 = this.getDistance(student3, student4);
+		
+		max = (tmpMax1 > tmpMax2) ? tmpMax1 : tmpMax2; 
+		max = (tmpMax3 > max) ? tmpMax3 : max; 
+		max = (tmpMax4 > max) ? tmpMax4 : max; 
+		max = (tmpMax5 > max) ? tmpMax5 : max; 
+		max = (tmpMax6 > max) ? tmpMax6 : max; 
+		
+		return max;
 	}
 
 	/**

@@ -1,13 +1,13 @@
-package main.java.GroupsHybrid.AntColony;
-import main.java.GroupsHybrid.AntColony.Interfaces.AntColony;
+package main.java.Groups.AntColony;
+import main.java.Groups.AntColony.Interfaces.AntColony;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import main.java.GroupsHybrid.AntColony.Structure.AntColonyArray;
-import main.java.GroupsHybrid.Data.StudentScores;
+import main.java.Groups.AntColony.Structure.AntColonyArray;
+import main.java.Groups.Data.StudentScores;
 
 
 public class Program {

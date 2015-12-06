@@ -1,13 +1,13 @@
-package main.java.GroupsHybrid.AntColony.Structure;
+package main.java.Groups.AntColony.Structure;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import main.java.GroupsHybrid.AntColony.Interfaces.AntColony;
-import main.java.GroupsHybrid.Data.StudentScores;
-import main.java.GroupsHybrid.Data.StudentGroups;
+import main.java.Groups.AntColony.Interfaces.AntColony;
+import main.java.Groups.Data.StudentScores;
+import main.java.Groups.Data.StudentGroups;
 
 //Implementation similar to the one of James McCaffrey
 //(http://msdn.microsoft.com/de-de/magazine/hh781027.aspx)
@@ -15,10 +15,12 @@ public class AntColonyArray implements AntColony {
 
 	private StudentScores scores = new StudentScores();
 	private StudentGroups groups = new StudentGroups();
+	private double[] antsGh;
 
 	@Override
 	public List<Integer> solve(int[] studentNodes, int iterations, int antCount,
 		double alpha, double beta, double rho, double Q) {
+		this.antsGh = new double[antCount];
 
 		double[][] distances = InitializerArray.computeDistances(studentNodes, scores);
 		double[][] pheromones = InitializerArray.initPheromones(studentNodes);
@@ -29,13 +31,8 @@ public class AntColonyArray implements AntColony {
 		int count = 0;
 		boolean end = false;
 		while (!end) {
-			long startTime = System.currentTimeMillis();
-			System.out.println("time updatetrails start: " + (System.currentTimeMillis() - startTime));
 			updateTrails(ants, pheromones, distances, alpha, beta);
-			System.out.println("time pheromones start: " + (0.01 * (System.currentTimeMillis() - startTime)) + " seconds");
-			// use the best one to update global pheremone level
 			updatePheromones(pheromones, ants, rho, Q);
-			System.out.println("time pheromones end: " + (0.01 * (System.currentTimeMillis() - startTime)) + " seconds");
 
 			// get the best one
 			int[] tmpBestTrail = getBestTrail(ants);
@@ -54,6 +51,7 @@ public class AntColonyArray implements AntColony {
 			}
 			printTrail(bestTrail);
 			printisValid(bestTrail);
+			//printEachGroupMaxDistance(bestTrail);
 
 		}
 		System.out.println("\n-------------AntColonyArray------------------------");
@@ -88,6 +86,7 @@ public class AntColonyArray implements AntColony {
 			int start = rand.nextInt(numStudents);
 			int[] trail = buildTrail(start, pheromones, distances, alpha, beta);
 			ants[i] = trail;
+			this.antsGh[i] = this.getSumGh(ants[i]);
 		}
 	}
 
@@ -118,10 +117,9 @@ public class AntColonyArray implements AntColony {
 			trail[i + 1] = next;
 			visited[next] = true;
 		}
-		//trail[numStudents] = trail[0];
 		return trail;
 	}
-	
+
 	/**
 	 *
 	 *
@@ -220,7 +218,7 @@ public class AntColonyArray implements AntColony {
 		for (int i = 0; i < pheromones.length; ++i) {
 			for (int j = i + 1; j < pheromones[i].length; ++j) {
 				for (int k = 0; k < ants.length; ++k) {
-					double length = getSumGh(ants[k]);
+					double length = this.antsGh[k];
 					double decrease = (1.0 - rho) * pheromones[i][j];
 					double increase = 0.0;
 					if (isEdgeInTrail(i, j, ants[k])) {
@@ -255,7 +253,6 @@ public class AntColonyArray implements AntColony {
 	private int[] getBestTrail(int[][] ants) {
 		List<Double> gh = new ArrayList<Double>();
 		for (int i = 0; i < ants.length; i++) {
-			//lengths.add(getSumGh(ants[i]));
 			gh.add(this.getSumGh(ants[i]));
 		}
 		Double maxGH = Collections.max(gh);
@@ -276,9 +273,9 @@ public class AntColonyArray implements AntColony {
 			int s2 = trail[(i * 4) + 1];
 			int s3 = trail[(i * 4) + 2];
 			int s4 = trail[(i * 4) + 3];
-			
+
 			double gh = scores.getGhValue(s1, s2, s3, s4);
-			
+
 			if (gh >= 0.5 && scores.getMaxDistance(s1, s2, s3, s4) > 2) {
 				sumGh += gh;
 			}
@@ -294,44 +291,15 @@ public class AntColonyArray implements AntColony {
 		return result;
 	}
 
-	private void printDistances(double[][] distances) {
-		System.out.println("----Distances----");
-		for (double[] i : distances) {
-			StringBuilder sb = new StringBuilder();
-			for (double j : i) {
-				sb.append(j + ", ");
-			}
-			System.out.println(sb);
-		}
-		System.out.println("--------");
-	}
-
-	private void printPheromones(double[][] pheromones) {
-		System.out.println("----Pheromones----");
-		for (double[] i : pheromones) {
-			StringBuilder sb = new StringBuilder();
-			for (double j : i) {
-				sb.append(j + ", ");
-			}
-			System.out.println(sb);
-		}
-		System.out.println("--------");
-	}
-
-	private void printAnts(int[][] ants) {
-		System.out.println("----Ants----");
-		for (int[] trail : ants) {
-			printTrail(trail);
-		}
-		System.out.println("--------");
-	}
-
 	private void printTrail(int[] trail) {
 		StringBuilder sb = new StringBuilder(getSumGh(trail)
 			+ ": ");
-		for (int j : trail) {
-			sb.append(j + ", ");
+		for (int i = 0; i < trail.length; i++) {
+
 		}
+//		for (int j : trail) {
+//			sb.append(j + ", ");
+//		}
 		System.out.println(sb);
 	}
 
@@ -342,6 +310,15 @@ public class AntColonyArray implements AntColony {
 			System.out.println("ALL groups are valid");
 
 		}
+	}
+
+	private void printEachGroupMaxDistance(int[] bestTrail) {
+		StringBuilder bt = new StringBuilder(groups.getEachGroupMaxDistance(bestTrail)
+			+ ": ");
+		for (int j : bestTrail) {
+			bt.append(j + ", ");
+		}
+		System.out.println(bt);
 	}
 
 }
