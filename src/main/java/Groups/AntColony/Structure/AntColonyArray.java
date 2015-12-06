@@ -44,24 +44,22 @@ public class AntColonyArray implements AntColony {
 
 				System.out.println(count + " -------------------------------------");
 				printTrail(bestTrail);
+				printisValid(bestTrail);
+				printEachGroupMaxDistance(bestTrail);
+				printEachGroupGh(bestTrail);
 			}
 
 			if (++count >= iterations) {
 				end = true;
 			}
-			printTrail(bestTrail);
-			printisValid(bestTrail);
-			//printEachGroupMaxDistance(bestTrail);
+			
+			//printTrail(bestTrail);
+			System.out.println(count);
 
 		}
 		System.out.println("\n-------------AntColonyArray------------------------");
 		printTrail(bestTrail);
 		System.out.println("ITERATIONS = " + iterations);
-		System.out.println("ANTS = " + antCount);
-		System.out.println("ALPHA = " + alpha);
-		System.out.println("BETA = " + beta);
-		System.out.println("RHO = " + rho);
-		System.out.println("Q = " + Q);
 
 		return convertToList(bestTrail);
 	}
@@ -297,28 +295,36 @@ public class AntColonyArray implements AntColony {
 		for (int i = 0; i < trail.length; i++) {
 
 		}
-//		for (int j : trail) {
-//			sb.append(j + ", ");
-//		}
+		for (int j : trail) {
+			sb.append(j + ", ");
+		}
 		System.out.println(sb);
 	}
 
 	private void printisValid(int[] bestTrail) {
 		if (false == groups.isValid(bestTrail)) {
-			System.out.println("NOT all groups are valid");
+			System.out.println("All valid groups: FALSE");
 		} else {
-			System.out.println("ALL groups are valid");
+			System.out.println("All valid groups: TRUE");
 
 		}
 	}
 
 	private void printEachGroupMaxDistance(int[] bestTrail) {
-		StringBuilder bt = new StringBuilder(groups.getEachGroupMaxDistance(bestTrail)
-			+ ": ");
-		for (int j : bestTrail) {
-			bt.append(j + ", ");
+		StringBuilder md = new StringBuilder("Group Max ED: ");
+		double[] g = groups.getEachGroupMaxDistance(bestTrail);
+		for (double j : g) {
+			md.append(j + ", ");
 		}
-		System.out.println(bt);
+		System.out.println(md);
 	}
-
+	
+	private void printEachGroupGh(int[] bestTrail) {
+		StringBuilder gh = new StringBuilder("Group GH: ");
+		double[] g = groups.getEachGroupGH(bestTrail);
+		for (double j : g) {
+			gh.append(j + ", ");
+		}
+		System.out.println(gh);
+	}
 }

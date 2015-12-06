@@ -16,37 +16,6 @@ public class StudentGroups extends StudentScores{
 	public final static int MAXIMUM_STUDENTS = 512;
 
 	/**
-	 * Required for the output, intended for use once the best/fittest class has
-	 * been selected.
-	 * 
-	 * @return Array
-	 */
-	public String[] getMembers(int[] bestTrail) {
-		int dimension1 = this.MAXIMUM_STUDENTS / 4;
-		String[] members = new String[dimension1];
-
-		// loop through bestGroup to get individual members
-		for (int i = 0; i < this.MAXIMUM_STUDENTS / 4; i++) {
-
-			int i1 = bestTrail[(i * 4)];
-			int i2 = bestTrail[(i * 4) + 1];
-			int i3 = bestTrail[(i * 4) + 2];
-			int i4 = bestTrail[(i * 4) + 3];
-
-			String s1 = Integer.toString(i1);
-			String s2 = Integer.toString(i2);
-			String s3 = Integer.toString(i3);
-			String s4 = Integer.toString(i4);
-
-			members[i] = s1 + "," + s2 + "," + s3 + "," + s4;
-
-		}
-
-		return members;
-
-	}
-
-	/**
 	 * Output the highest Euclidean distance of each group.
 	 * 
 	 * @return double eachGroupMaxDistance
@@ -68,7 +37,29 @@ public class StudentGroups extends StudentScores{
 		return eachGroupMaxDistance;
 
 	}
+	
+	/**
+	 * Output each group's GH, or Goodness Heterogeneity
+	 * 
+	 * @return double
+	 */
+	public double[] getEachGroupGH(int[] bestTrail) {
+		double[] eachGroupGH = new double[(this.MAXIMUM_STUDENTS / 4)];
+		// loop through best group to get individual members
+		for (int i = 0; i < this.MAXIMUM_STUDENTS / 4; i++) {
 
+			int s1 = bestTrail[(i * 4)];
+			int s2 = bestTrail[(i * 4) + 1];
+			int s3 = bestTrail[(i * 4) + 2];
+			int s4 = bestTrail[(i * 4) + 3];
+
+			// set the variable with values
+			eachGroupGH[i] = this.getGhValue(s1, s2, s3, s4);
+
+		}
+
+		return eachGroupGH;
+	}
 	/**
 	 * 
 	 * @param bestTrail
@@ -77,7 +68,7 @@ public class StudentGroups extends StudentScores{
 	public boolean isValid(int[] bestTrail) {
 		Boolean allValidGroups = true;
 
-		for (int i = 0; i < StudentScores.MAXIMUM_STUDENTS / 4; i++) {
+		for (int i = 0; i < this.MAXIMUM_STUDENTS / 4; i++) {
 
 			int s1 = bestTrail[(i * 4)];
 			int s2 = bestTrail[(i * 4) + 1];
