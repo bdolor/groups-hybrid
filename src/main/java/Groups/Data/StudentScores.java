@@ -64,11 +64,11 @@ public class StudentScores {
 
 		double adValue = (sorted[0] + sorted[3]) / 2;
 		double ghValue = (sorted[3] - sorted[0])
-			/ (1 + Math.abs(adValue - sorted[1]) + Math.abs(adValue - sorted[2]));
+			/ (1 + ( Math.abs(adValue - sorted[1]) + Math.abs(adValue - sorted[2]) ));
 		return ghValue;
 	}
 
-	private void sort(double[] sorted) {
+	public void sort(double[] sorted) {
 
 		double tmp;
 		for (int i = 0; i < sorted.length - 1; i++) {
@@ -81,7 +81,7 @@ public class StudentScores {
 
 		}
 	}
-		
+	
 	/**
 	 * Given four student IDs return the maximum Euclidean Distance of that group
 	 * 
