@@ -7,7 +7,7 @@ import main.java.Groups.Data.StudentScores;
 
 public class Program {
 
-	private final static int MAX_ITERATIONS = 10000;
+	private final static int MAX_ITERATIONS = 200;
 	private final static int ANTS = (int) Math.round(0.02 * StudentScores.MAXIMUM_STUDENTS);// 10 ants
 	private final static double ALPHA = 0.1;// was 3.0; used in probability calculation
 	private final static double BETA = 0.1;// was 2.0 used in probability calculation
