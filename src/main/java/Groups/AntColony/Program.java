@@ -19,6 +19,7 @@ public class Program {
 		int [] studentNodes = scores.getAllSummedScores();
 		AntColony ac = new AntColonyArray();
 		long start = System.currentTimeMillis();
+		
 		ac.solve(studentNodes, MAX_ITERATIONS, ANTS, ALPHA, BETA, RHO, Q);
 		System.out.println("time: " + (System.currentTimeMillis() - start));
 	}

@@ -29,12 +29,12 @@ public class AntColonyArray implements AntColony {
 		int[] bestTrail = ants[bestTrailIndex];
 		double bestGH = getSumGh(bestTrail);
 
-//		int[] s = scores.getAllSummedScores();
-//		List<Double> scoresAscending = new ArrayList<Double>();
-//		for ( int i = 0; i < studentNodes.length; i++ ){
-//			scoresAscending.add((double)s[i]);
-//		}
-//		Collections.sort(scoresAscending);
+		System.out.println("0 -------------------------------------");
+				printTrail(bestTrail);
+				printisValid(bestTrail);
+				printEachGroupMaxDistance(bestTrail);
+				printEachGroupGh(bestTrail);
+				
 		int count = 0;
 		boolean end = false;
 		while (!end) {
@@ -151,9 +151,37 @@ public class AntColonyArray implements AntColony {
 	private int nextStudent(int studentId, boolean[] visited, double[][] pheromones,
 		double[][] distances, double alpha, double beta, ArrayList groupScore) {
 		double[] moveProbabilities = getMoveProbabilities(studentId, visited,
-			pheromones, distances, alpha, beta, groupScore);
+			pheromones, distances, alpha, beta);
 		int numStudents = pheromones.length;
+		
+		int[] allScores = scores.getAllSummedScores();
 
+		// 20% of the time, return the student that will ensure the best GH
+		if (groupScore.size() % 4 == 3) {
+			//measure the gh of the group
+			int score1 = allScores[groupScore.size() - 1];
+			int score2 = allScores[groupScore.size() - 2];
+			int score3 = allScores[groupScore.size() - 3];
+
+			double bestGh = 0.0;
+			int bestStudentId = 0; 
+			// pick the next student based solely on what will give the 
+			// group the highest GH score.
+			
+			for ( int i = 0; i < allScores.length; i++ ){
+				// get the potential GH
+				if ( ! visited[i] ){
+					double tmp = scores.getGhValue(score1, score2, score3, allScores[i]);
+					if ( tmp > bestGh) {
+						bestGh = tmp;
+						bestStudentId = i;
+					}
+				}
+				
+			}
+			return bestStudentId;
+		}
+		//
 		double rand = new Random().nextDouble();
 
 		double tot = 0;
@@ -163,25 +191,7 @@ public class AntColonyArray implements AntColony {
 				return i;
 			}
 		}
-		// create a sorted (ascending) list of probabilities for each 
-		// student 
-		// need to add  
-//			double[] cumul = new double[numStudents + 1];
-//			cumul[0] = 0.0;
-//			for (int i = 0; i < numStudents; i++) {
-//				cumul[i + 1] = cumul[i] + moveProbabilities[i];
-//			}
-//			// need the last one to be this val in case the next one is 511
-//			cumul[numStudents] = 1.0;
 
-		// pick a random number, iterate through the sorted list
-		// if that number is in between the current student and next student
-		// return the index of that student.
-//			for (int i = 0; i < numStudents; i++) {
-//				if (rand >= cumul[i] && rand < cumul[i + 1]) {
-//					return i;
-//				}
-//			}
 		return -1;
 	}
 
@@ -197,22 +207,11 @@ public class AntColonyArray implements AntColony {
 	 * @return
 	 */
 	private double[] getMoveProbabilities(int studentId, boolean[] visited,
-		double[][] pheromones, double[][] distances, double alpha, double beta, ArrayList groupScore) {
+		double[][] pheromones, double[][] distances, double alpha, double beta) {
 		int numStudents = pheromones.length;
 		double[] combined = new double[numStudents];
 		double maxED = 5.29;
 		double sum = 0.0;
-		int[] allScores = scores.getAllSummedScores();
-
-		// if it's low, increase the likelihood that a high number will be chosen
-		if (groupScore.size() % 3 == 0) {
-			//measure the gh of the group
-			int score1 = allScores[groupScore.size() - 1];
-			int score2 = allScores[groupScore.size() - 2];
-			int score3 = allScores[groupScore.size() - 3];
-
-			int scoreTotal = score1 + score2 + score3;
-		}
 
 		// calculate that probability that a student will be visited 
 		// based on a meausurement of both pheremone level and distance 
