@@ -36,7 +36,7 @@ public class InitializerArray {
 		double[][] globalPheromones = new double[studentNodes.length][studentNodes.length];
 		for (int i = 0; i < studentNodes.length; i++) {
 			for (int j = 0; j < studentNodes.length; j++) {
-				globalPheromones[i][j] = 0.01;
+				globalPheromones[i][j] = 0.001;
 			}
 		}
 		return globalPheromones;
