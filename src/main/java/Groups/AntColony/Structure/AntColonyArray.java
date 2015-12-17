@@ -16,6 +16,7 @@ public class AntColonyArray implements AntColony {
 	private StudentScores scores = new StudentScores();
 	private StudentGroups groups = new StudentGroups();
 	private double[] antsGh;
+	private int validGroups;
 
 	@Override
 	public List<Integer> solve(int[] studentNodes, int iterations, int antCount,
@@ -38,11 +39,14 @@ public class AntColonyArray implements AntColony {
 		int count = 0;
 		boolean end = false;
 		while (!end) {
+			this.validGroups = 0;
 			updateTrails(ants, pheromones, distances, alpha, beta);
 
 			// get the best one
 			int tmpBestTrail = getBestTrail(ants);
+			// evaporate
 			updatePheromones(pheromones, ants, rho, Q);
+			// update edges with valid groups
 			increasePheromones(pheromones, ants);
 
 			double tmpBestGH = getSumGh(ants[tmpBestTrail]);
@@ -63,7 +67,8 @@ public class AntColonyArray implements AntColony {
 			}
 
 			//printTrail(bestTrail);
-			System.out.println("iteration: " + count);
+			System.out.println("iteration: " + count + " | valid groups created: " + validGroups + "/" + (antCount * 128) + " | number of ants: " + antCount );
+			
 
 		}
 		System.out.println("\n-------------AntColonyArray------------------------");
@@ -156,6 +161,8 @@ public class AntColonyArray implements AntColony {
 		int numStudents = pheromones.length;
 
 		int[] allScores = scores.getAllSummedScores();
+		// if the first number is low, go for high
+		//if ( groupScore.size() )
 
 		// 20% of the time, return the student that will ensure the best GH
 		if (groupScore.size() % 4 == 3) {
@@ -240,79 +247,79 @@ public class AntColonyArray implements AntColony {
 
 	private void increasePheromones(double[][] pheromones, int[][] ants) {
 		// if all 128 groups had a maxGH of 14
-		int maxSumGh = 792;
+		int maxSumGh = 1792;
 		// set up for increase routine
 		double increase1, increase2, increase3, increase4, increase5, increase6, phere1, phere2,
 			phere3, phere4, phere5, phere6;
 		increase1 = increase2 = increase3 = increase4 = increase5 = increase6 = phere1 = phere2
 			= phere3 = phere4 = phere5 = phere6 = 0.0;
-		int s = 0;
 
 		// loop through each ant trail and update edges only if a valid group has been formed.
 		for (int k = 0; k < ants.length; ++k) {
+			for (int s = 0; s < pheromones.length / 4; s++) {
+				// stored value for sumGH saves repetitive computation
+				double sumGh = this.antsGh[k];
 
-			// stored value for sumGH saves repetitive computation
-			double sumGh = this.antsGh[k];
+				// only increase paths between students in a group
+				int stu1 = ants[k][(s * 4)];
+				int stu2 = ants[k][(s * 4) + 1];
+				int stu3 = ants[k][(s * 4) + 2];
+				int stu4 = ants[k][(s * 4) + 3];
 
-			// only increase paths between students in a group
-			int stu1 = ants[k][(s * 4)];
-			int stu2 = ants[k][(s * 4) + 1];
-			int stu3 = ants[k][(s * 4) + 2];
-			int stu4 = ants[k][(s * 4) + 3];
+				// ensures an increase in pheromones only if it's a valid group
+				if (scores.getMaxDistance(stu1, stu2, stu3, stu4) > 2 && scores.getGhValue(stu1, stu2, stu3, stu4) >= 0.5) {
+					this.validGroups++;
+					// student1 and student2
+					if (isEdgeInTrail(stu1, stu2, ants[k])) {
+						phere1 = pheromones[stu1][stu2];
+						increase1 = (sumGh / maxSumGh);
+					}
+					// student1 and student3
+					if (isEdgeInTrail(stu1, stu3, ants[k])) {
+						phere2 = pheromones[stu1][stu3];
+						increase2 = (sumGh / maxSumGh);
+					}
+					// student1 and student4
+					if (isEdgeInTrail(stu1, stu4, ants[k])) {
+						phere3 = pheromones[stu1][stu4];
+						increase3 = (sumGh / maxSumGh);
+					}
+					// student2 and student3
+					if (isEdgeInTrail(stu2, stu3, ants[k])) {
+						phere4 = pheromones[stu2][stu3];
+						increase4 = (sumGh / maxSumGh);
+					}
+					// student2 and student4
+					if (isEdgeInTrail(stu2, stu4, ants[k])) {
+						phere5 = pheromones[stu2][stu4];
+						increase5 = (sumGh / maxSumGh);
+					}
+					// student3 and student4
+					if (isEdgeInTrail(stu3, stu4, ants[k])) {
+						phere6 = pheromones[stu1][stu4];
+						increase6 = (sumGh / maxSumGh);
+					}
+					//student 1 to 2
+					pheromones[stu1][stu2] = phere1 + increase1;
+					pheromones[stu2][stu1] = pheromones[stu1][stu2];
+					// student1 to 3
+					pheromones[stu1][stu3] = phere2 + increase2;
+					pheromones[stu3][stu1] = pheromones[stu1][stu3];
+					// student1 to 4
+					pheromones[stu1][stu4] = phere3 + increase3;
+					pheromones[stu4][stu1] = pheromones[stu1][stu4];
+					// student2 to 3
+					pheromones[stu2][stu3] = phere4 + increase4;
+					pheromones[stu3][stu2] = pheromones[stu2][stu3];
+					// student2 to 4
+					pheromones[stu2][stu4] = phere5 + increase5;
+					pheromones[stu4][stu2] = pheromones[stu2][stu4];
+					// student3 to 4
+					pheromones[stu3][stu4] = phere6 + increase6;
+					pheromones[stu4][stu3] = pheromones[stu3][stu4];
 
-			// ensures an increase in pheromones only if it's a valid group
-			if (scores.getMaxDistance(stu1, stu2, stu3, stu4) > 2 && scores.getGhValue(stu1, stu2, stu3, stu4) >= 0.5) {
-				// student1 and student2
-				if (isEdgeInTrail(stu1, stu2, ants[k])) {
-					phere1 = pheromones[stu1][stu2];
-					increase1 = (sumGh / maxSumGh);
 				}
-				// student1 and student3
-				if (isEdgeInTrail(stu1, stu3, ants[k])) {
-					phere2 = pheromones[stu1][stu3];
-					increase2 = (sumGh / maxSumGh);
-				}
-				// student1 and student4
-				if (isEdgeInTrail(stu1, stu4, ants[k])) {
-					phere3 = pheromones[stu1][stu4];
-					increase3 = (sumGh / maxSumGh);
-				}
-				// student2 and student3
-				if (isEdgeInTrail(stu2, stu3, ants[k])) {
-					phere4 = pheromones[stu2][stu3];
-					increase4 = (sumGh / maxSumGh);
-				}
-				// student2 and student4
-				if (isEdgeInTrail(stu2, stu4, ants[k])) {
-					phere5 = pheromones[stu2][stu4];
-					increase5 = (sumGh / maxSumGh);
-				}
-				// student3 and student4
-				if (isEdgeInTrail(stu3, stu4, ants[k])) {
-					phere6 = pheromones[stu1][stu4];
-					increase6 = (sumGh / maxSumGh);
-				}
-				//student 1 to 2
-				pheromones[stu1][stu2] = phere1 + increase1;
-				pheromones[stu2][stu1] = pheromones[stu1][stu2];
-				// student1 to 3
-				pheromones[stu1][stu3] = phere2 + increase2;
-				pheromones[stu3][stu1] = pheromones[stu1][stu3];
-				// student1 to 4
-				pheromones[stu1][stu4] = phere3 + increase3;
-				pheromones[stu4][stu1] = pheromones[stu1][stu4];
-				// student2 to 3
-				pheromones[stu2][stu3] = phere4 + increase4;
-				pheromones[stu3][stu2] = pheromones[stu2][stu3];
-				// student2 to 4
-				pheromones[stu2][stu4] = phere5 + increase5;
-				pheromones[stu4][stu2] = pheromones[stu2][stu4];
-				// student3 to 4
-				pheromones[stu3][stu4] = phere6 + increase6;
-				pheromones[stu4][stu3] = pheromones[stu3][stu4];
-
 			}
-			s++;
 		}
 	}
 
