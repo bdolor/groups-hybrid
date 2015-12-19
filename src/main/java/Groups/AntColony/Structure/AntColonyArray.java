@@ -19,7 +19,7 @@ public class AntColonyArray implements AntColony {
 	private double sumEd;
 
 	@Override
-	public List<Integer> solve(int[] studentNodes, int iterations, int antCount,
+	public boolean solve(int[] studentNodes, int iterations, int antCount,
 		double alpha, double beta, double rho) {
 		this.antsGh = new double[antCount];
 
@@ -45,7 +45,7 @@ public class AntColonyArray implements AntColony {
 			// evaporate
 			updatePheromones(pheromones, ants, rho);
 			// update edges of all valid groups for all ant trails
-			increasePheromones(pheromones, ants);
+			increasePheromones(pheromones, ants, rho);
 
 			double tmpBestGH = getSumGh(ants[tmpBestTrail]);
 
@@ -54,11 +54,11 @@ public class AntColonyArray implements AntColony {
 				stale = 0;
 				bestTrail = ants[tmpBestTrail];
 				bestGH = tmpBestGH;
-				System.out.println("sumGH = "+bestGH);
+				System.out.println("sumGH = " + bestGH);
 
 				// only print it out if it's valid
 				if (groups.isValid(bestTrail)) {
-					System.out.println("\n" + count + "-------------------------------------");
+					System.out.println("\nVALID SOLUTION at " + count);
 					printTrail(bestTrail);
 					System.out.println("ALL VALID GROUPS: TRUE");
 					System.out.println("GROUP MAX ED SUM: " + this.sumEd);
@@ -73,14 +73,14 @@ public class AntColonyArray implements AntColony {
 			}
 
 			System.out.print(".");
-			if ( stale != 0 && stale % 75 == 0 ){
+			if (stale != 0 && stale % 75 == 0) {
 				System.out.print("\n");
 			}
 			//System.out.println("iteration: " + count + " | valid groups: " + validGroups + "/" + (antCount * 128) + " | avg sumGH " + this.avgGh );
 			stale++;
 
 		}
-		System.out.println("\n Final Ant Colony Array ------------------------");
+		System.out.println("\n ------------------------ Final Ant Colony Array ------------------------");
 		System.out.println("ALPHA: " + alpha + " BETA: " + beta + "RHO: " + rho);
 		printTrail(bestTrail);
 		printisValid(bestTrail);
@@ -94,8 +94,9 @@ public class AntColonyArray implements AntColony {
 		System.out.println("********************************************* | END");
 		System.out.println("");
 		System.out.println("");
-
-		return convertToList(bestTrail);
+		
+		return groups.isValid(bestTrail);
+		
 	}
 
 	/**
@@ -159,7 +160,7 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param studentId
 	 * @param visited
 	 * @param pheromones
@@ -168,7 +169,7 @@ public class AntColonyArray implements AntColony {
 	 * @param beta
 	 * @param groupScore
 	 * @param trail
-	 * @return 
+	 * @return
 	 */
 	private int nextStudent(int studentId, boolean[] visited, double[][] pheromones,
 		double[][] distances, double alpha, double beta, ArrayList groupScore, int[] trail) {
@@ -219,7 +220,7 @@ public class AntColonyArray implements AntColony {
 						validGroupStudentId = i;
 					}
 				}
-				// push comes to shove, take the valid over the best
+				// take the valid over the best if it's available
 				if (validGroupStudentId != allScores.length + 100) {
 					bestStudentId = validGroupStudentId;
 				}
@@ -228,7 +229,7 @@ public class AntColonyArray implements AntColony {
 			// return best student
 			return bestStudentId;
 		}
-		
+
 		// Explore!
 		double tot = 0;
 		for (int i = 0; i < numStudents; i++) {
@@ -240,8 +241,9 @@ public class AntColonyArray implements AntColony {
 
 		return -1;
 	}
+
 	/**
-	 * 
+	 *
 	 * @param studentId
 	 * @param visited
 	 * @param pheromones
@@ -249,7 +251,7 @@ public class AntColonyArray implements AntColony {
 	 * @param alpha
 	 * @param beta
 	 * @param allScores
-	 * @return 
+	 * @return
 	 */
 	private double[] getMoveProbabilities(int studentId, boolean[] visited,
 		double[][] pheromones, double[][] distances, double alpha, double beta, int[] allScores) {
@@ -257,8 +259,6 @@ public class AntColonyArray implements AntColony {
 		double[] combined = new double[numStudents];
 		double maxED = 5.29;
 		double sum = 0.0;
-
-		int stuScore = allScores[studentId];
 
 		// calculate that probability that a student will be visited 
 		// based on a meausurement of both pheremone level and distance 
@@ -285,11 +285,11 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param pheromones
-	 * @param ants 
+	 * @param ants
 	 */
-	private void increasePheromones(double[][] pheromones, int[][] ants) {
+	private void increasePheromones(double[][] pheromones, int[][] ants, double rho) {
 
 		// set up for increase routine
 		double increase1, increase2, increase3, increase4, increase5, increase6, phere1, phere2,
@@ -364,16 +364,35 @@ public class AntColonyArray implements AntColony {
 					pheromones[stu3][stu4] = phere6 + increase6;
 					pheromones[stu4][stu3] = pheromones[stu3][stu4];
 
+				} else { // discourage invalid groups
+					//student 1 to 2
+					pheromones[stu1][stu2] = (1.0 - rho) * pheromones[stu1][(stu2)];
+					pheromones[stu2][stu1] = pheromones[stu1][stu2];
+					// student1 to 3
+					pheromones[stu1][stu3] = (1.0 - rho) * pheromones[stu1][(stu3)];
+					pheromones[stu3][stu1] = pheromones[stu1][stu3];
+					// student1 to 4
+					pheromones[stu1][stu4] = (1.0 - rho) * pheromones[stu1][(stu4)];
+					pheromones[stu4][stu1] = pheromones[stu1][stu4];
+					// student2 to 3
+					pheromones[stu2][stu3] = (1.0 - rho) * pheromones[stu2][(stu3)];
+					pheromones[stu3][stu2] = pheromones[stu2][stu3];
+					// student2 to 4
+					pheromones[stu2][stu4] = (1.0 - rho) * pheromones[stu2][(stu4)];
+					pheromones[stu4][stu2] = pheromones[stu2][stu4];
+					// student3 to 4
+					pheromones[stu3][stu4] = (1.0 - rho) * pheromones[stu3][(stu4)];
+					pheromones[stu4][stu3] = pheromones[stu3][stu4];
 				}
 			}
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * @param pheromones
 	 * @param ants
-	 * @param rho 
+	 * @param rho
 	 */
 	private void updatePheromones(double[][] pheromones, int[][] ants, double rho) {
 
@@ -428,12 +447,12 @@ public class AntColonyArray implements AntColony {
 	 * @return
 	 */
 	private int getBestTrail(int[][] ants) {
-		List<Double> gh = new ArrayList<Double>();
+		List<Double> gh = new ArrayList<>();
 		double sumGh = 0;
 
-		for (int i = 0; i < ants.length; i++) {
-			gh.add(this.getSumGh(ants[i]));
-			sumGh += this.getSumGh(ants[i]);
+		for (int[] ant : ants) {
+			gh.add(this.getSumGh(ant));
+			sumGh += this.getSumGh(ant);
 		}
 		Double maxGH = Collections.max(gh);
 		this.avgGh = sumGh / ants.length;
@@ -464,12 +483,12 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param array
-	 * @return 
+	 * @return
 	 */
 	private List<Integer> convertToList(int[] array) {
-		List<Integer> result = new ArrayList<Integer>();
+		List<Integer> result = new ArrayList<>();
 		for (int i : array) {
 			result.add(i);
 		}
@@ -477,8 +496,8 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * 
-	 * @param trail 
+	 *
+	 * @param trail
 	 */
 	private void printTrail(int[] trail) {
 		StringBuilder sb = new StringBuilder("SUM GH: " + getSumGh(trail)
@@ -493,8 +512,8 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * 
-	 * @param bestTrail 
+	 *
+	 * @param bestTrail
 	 */
 	private void printisValid(int[] bestTrail) {
 		if (false == groups.isValid(bestTrail)) {
@@ -506,24 +525,24 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * 
-	 * @param bestTrail 
+	 *
+	 * @param bestTrail
 	 */
 	private void printEachGroupMaxDistance(int[] bestTrail) {
 		StringBuilder md = new StringBuilder("EACH GROUP MAX ED: ");
 		double[] g = groups.getEachGroupMaxDistance(bestTrail);
-		double sumEd = 0;
+		double sumMaxEd = 0;
 		for (double j : g) {
-			sumEd += j;
+			sumMaxEd += j;
 			md.append(j + ", ");
 		}
-		this.sumEd = sumEd;
+		this.sumEd = sumMaxEd;
 		System.out.println(md);
 	}
 
 	/**
-	 * 
-	 * @param bestTrail 
+	 *
+	 * @param bestTrail
 	 */
 	private void printEachGroupGh(int[] bestTrail) {
 		StringBuilder gh = new StringBuilder("EACH GROUP GH: ");
@@ -535,8 +554,8 @@ public class AntColonyArray implements AntColony {
 	}
 
 	/**
-	 * 
-	 * @param pheromones 
+	 *
+	 * @param pheromones
 	 */
 	private void printPheromones(double[][] pheromones) {
 		System.out.println("----Pheromones----");
