@@ -3,7 +3,6 @@ package main.java.Groups.AntColony.Structure;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import main.java.Groups.Data.StudentScores;
 
 public class InitializerArray {

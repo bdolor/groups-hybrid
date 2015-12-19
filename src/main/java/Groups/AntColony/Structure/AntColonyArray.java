@@ -28,6 +28,8 @@ public class AntColonyArray implements AntColony {
 		int[][] ants = InitializerArray.initAnts(antCount, studentNodes);
 		int bestTrailIndex = getBestTrail(ants);
 		int[] bestTrail = ants[bestTrailIndex];
+		int[][] bestValidTrail = new int [1][bestTrail.length];
+		boolean validSolutionFound = false;
 		double bestGH = getSumGh(bestTrail);
 
 		System.out.println("START ********************************************* | number of ants: " + antCount);
@@ -59,12 +61,18 @@ public class AntColonyArray implements AntColony {
 				// only print it out if it's valid
 				if (groups.isValid(bestTrail)) {
 					System.out.println("\nVALID SOLUTION at " + count);
-					printTrail(bestTrail);
 					System.out.println("ALL VALID GROUPS: TRUE");
+					printTrail(bestTrail);
 					System.out.println("GROUP MAX ED SUM: " + this.sumEd);
 					printEachGroupMaxDistance(bestTrail);
 					printEachGroupGh(bestTrail);
 					System.out.println("------------------------------------- | Continuing to  search -");
+					// save for later
+					bestValidTrail[0] = bestTrail;
+					validSolutionFound = true;
+					// re-inforce the best solution 
+					increasePheromones( pheromones, bestValidTrail, rho );
+					
 				}
 			}
 			// check on the terminating condition
@@ -80,10 +88,13 @@ public class AntColonyArray implements AntColony {
 			stale++;
 
 		}
+		if ( validSolutionFound ){
+			bestTrail = bestValidTrail[0];
+		}
 		System.out.println("\n ------------------------ Final Ant Colony Array ------------------------");
+		printisValid(bestTrail);
 		System.out.println("ALPHA: " + alpha + " BETA: " + beta + "RHO: " + rho);
 		printTrail(bestTrail);
-		printisValid(bestTrail);
 		System.out.println("GROUP MAX ED SUM: " + this.sumEd);
 		printEachGroupMaxDistance(bestTrail);
 		printEachGroupGh(bestTrail);
@@ -95,7 +106,7 @@ public class AntColonyArray implements AntColony {
 		System.out.println("");
 		System.out.println("");
 		
-		return groups.isValid(bestTrail);
+		return validSolutionFound;
 		
 	}
 
@@ -203,7 +214,7 @@ public class AntColonyArray implements AntColony {
 			int bestStudentId = 0;
 			int validGroupStudentId = allScores.length + 100; //something out of range
 
-			// pick the next student based solely on what will give the 
+			// pick the next student based on what will give the 
 			// group the highest GH score.
 			for (int i = 0; i < numStudents; i++) {
 				// get the potential GH
@@ -215,7 +226,7 @@ public class AntColonyArray implements AntColony {
 						bestGh = tmpGh;
 						bestStudentId = i;
 					}
-					// even better is a winner that's valid
+					// even better if it's valid
 					if (tmpGh > 0.5 && maxEd > 2.0) {
 						validGroupStudentId = i;
 					}
