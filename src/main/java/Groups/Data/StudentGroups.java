@@ -75,7 +75,7 @@ public class StudentGroups extends StudentScores{
 			int s3 = bestTrail[(i * 4) + 2];
 			int s4 = bestTrail[(i * 4) + 3];
 
-			if (this.getMaxDistance(s1, s2, s3, s4) <= 2) {
+			if (this.getMaxDistance(s1, s2, s3, s4) <= 2.0) {
 				// only valid groups can contribute to the overall heterogenity
 				// of all groups
 				// continue on with loop to measure all valid groups
